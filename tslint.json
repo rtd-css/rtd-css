@@ -1,0 +1,27 @@
+{
+	"extends": ["tslint-config-airbnb", "tslint-consistent-codestyle"],
+	"linterOptions": {
+		"exclude": ["**/node_modules/**"]
+	},
+	"rules": {
+		"max-line-length": [true, 140],
+		"indent": [true, "tabs", 4],
+		"ter-indent": [
+			true,
+			"tab",
+			{ "SwitchCase": 1 }
+		],
+		"variable-name": [true, "check-format", "allow-leading-underscore"],
+		"function-name": [
+			true,
+			{
+				"function-regex": "^[a-z$][\\w\\d]+$",
+				"method-regex": "^[a-z$][\\w\\d]+$",
+				"private-method-regex": "^_?[a-z$][\\w\\d]+$",
+				"protected-method-regex": "^_?[a-z$][\\w\\d]+$",
+				"static-method-regex": "^[a-z$][\\w\\d]+$"
+			}
+		],
+		"no-increment-decrement": false
+	}
+}

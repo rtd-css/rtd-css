@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"module": "es2015",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"typeRoots": [
+			"node_modules/@types"
+		],
+		"outDir": "src-js",
+		"noImplicitAny": true,
+		"allowJs": true
+	},
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"**/*.spec.ts"
+	]
+}
