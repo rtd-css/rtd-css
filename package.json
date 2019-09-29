@@ -2,7 +2,7 @@
 	"name": "rtd-css",
 	"author": "little-foot-2",
 	"homepage": "https://rtd-css.github.io/",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"license": "Apache-2.0",
 	"description": "RTD-CSS is the compiler intended to split a CSS to different devices",
 	"keywords": [
@@ -26,10 +26,6 @@
 	},
 	"main": "./lib/index.cjs.js",
 	"module": "./lib/index.es.mjs",
-	"files": [
-		"./lib/index.cjs.js",
-		"./lib/index.es.mjs"
-	],
 	"scripts": {
 		"postinstall": "npm link rtd-css",
 		"pre-commit": "run-s format:fix lint",
