@@ -5,13 +5,10 @@ import { Compiler, Options } from '../../rtd-css';
 import { PostcssCssDriver } from '../../postcss-rtd-css';
 import { Cli } from './cli';
 
-export class RtdCssCliCompiler {
+export class FileCompiler {
 	private static readonly cssNamespaceExt = '.rtd';
 
-	compile(
-		inputFilePath: string,
-		outputDirectoryPath: string,
-	): void {
+	compile(inputFilePath: string, outputDirectoryPath: string): void {
 		const inputRoot = this.parseCssFile(inputFilePath);
 
 		const compiler = new Compiler();
@@ -19,8 +16,8 @@ export class RtdCssCliCompiler {
 
 		const parsedInputFilePath = path.parse(inputFilePath);
 
-		const createFileOptionsWithDevice = (outputDeviceName: string): RtdCssCliCompiler.OutputFileOptions => {
-			return <RtdCssCliCompiler.OutputFileOptions>{
+		const createFileOptionsWithDevice = (outputDeviceName: string): FileCompiler.OutputFileOptions => {
+			return <FileCompiler.OutputFileOptions>{
 				compileOptions: <Options>{
 					compileOnlyThisDevice: outputDeviceName,
 				},
@@ -33,14 +30,18 @@ export class RtdCssCliCompiler {
 			};
 		};
 
-		const outFileOptionsList: RtdCssCliCompiler.OutputFileOptions[] = [
+		const outFileOptionsList: FileCompiler.OutputFileOptions[] = [
 			createFileOptionsWithDevice(null),
 			createFileOptionsWithDevice(config.unknownDevice.name),
 			...config.deviceList.map(device => createFileOptionsWithDevice(device.name)),
 		];
 
 		for (const outFileOptions of outFileOptionsList) {
-			const outputRoot = compiler.compile<postcss.Root>(inputRoot, outFileOptions.compileOptions, new PostcssCssDriver());
+			const outputRoot = compiler.compile<postcss.Root>(
+				inputRoot,
+				outFileOptions.compileOptions,
+				new PostcssCssDriver(),
+			);
 			fs.writeFileSync(outFileOptions.filePath, outputRoot.toResult().css);
 		}
 	}
@@ -61,7 +62,7 @@ export class RtdCssCliCompiler {
 			outputDirectoryPath,
 			[
 				outputFileNameWithoutExt,
-				RtdCssCliCompiler.cssNamespaceExt,
+				FileCompiler.cssNamespaceExt,
 				outputDeviceName ? `.${outputDeviceName}` : '',
 				outputExt,
 			].join(''),
@@ -71,7 +72,7 @@ export class RtdCssCliCompiler {
 	}
 }
 
-export module RtdCssCliCompiler {
+export module FileCompiler {
 	export interface OutputFileOptions {
 		compileOptions: Options;
 		filePath: string;
