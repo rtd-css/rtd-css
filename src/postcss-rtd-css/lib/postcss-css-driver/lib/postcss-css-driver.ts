@@ -38,6 +38,10 @@ export class PostcssCssDriver implements TypedCssDriver<
 		return (root as PostcssCssTree.Root).postcssRoot;
 	}
 
+	parseCssToSourceRoot(css: string | Buffer): postcss.Root {
+		return postcss.parse(css);
+	}
+
 	prettify(sourceRoot: postcss.Root): postcss.Root {
 		return postcssPrettify.process(sourceRoot).root;
 	}

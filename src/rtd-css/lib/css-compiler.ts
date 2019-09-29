@@ -3,7 +3,7 @@ import { Options } from './options';
 import { LowLevelCompiler } from './low-level-compiler';
 import { ConfigModule } from './config';
 
-export class Compiler {
+export class CssCompiler {
 	compile<TSourceRoot>(sourceCssRoot: TSourceRoot, options: Options, cssDriver: CssDriver): TSourceRoot {
 		const inCompilerCssRoot = cssDriver.sourceRootToRoot(sourceCssRoot);
 

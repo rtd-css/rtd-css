@@ -15,6 +15,8 @@ export interface CssDriver {
 
 	rootToSourceRoot(root: CssTree.Root): any;
 
+	parseCssToSourceRoot(css: string | Buffer): any;
+
 	prettify(sourceRoot: any): any;
 }
 
@@ -38,6 +40,8 @@ export interface TypedCssDriver<
 	sourceRootToRoot(sourceRoot: TSourceRoot): CssTree.Root;
 
 	rootToSourceRoot(root: CssTree.Root): TSourceRoot;
+
+	parseCssToSourceRoot(css: string | Buffer): TSourceRoot;
 
 	prettify(sourceRoot: TSourceRoot): TSourceRoot;
 }

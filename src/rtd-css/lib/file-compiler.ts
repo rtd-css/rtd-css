@@ -1,18 +1,19 @@
-import postcss from 'postcss';
 import path from 'path';
 import fs from 'fs';
-import { Compiler, Options } from '../../rtd-css';
-import { PostcssCssDriver } from '../../postcss-rtd-css';
-import { Cli } from './cli';
+import { CssDriver } from '../../css-driver';
+import { CssCompiler } from './css-compiler';
+import { Options } from './options';
 
 export class FileCompiler {
 	private static readonly cssNamespaceExt = '.rtd';
 
-	compile(inputFilePath: string, outputDirectoryPath: string): void {
-		const inputRoot = this.parseCssFile(inputFilePath);
+	compile(inputFilePath: string, outputDirectoryPath: string, cssDriver: CssDriver): void {
+		const inputRoot = cssDriver.parseCssToSourceRoot(
+			fs.readFileSync(inputFilePath),
+		);
 
-		const compiler = new Compiler();
-		const config = compiler.loadConfig(inputRoot, new PostcssCssDriver());
+		const compiler = new CssCompiler();
+		const config = compiler.loadConfig(inputRoot, cssDriver);
 
 		const parsedInputFilePath = path.parse(inputFilePath);
 
@@ -37,19 +38,13 @@ export class FileCompiler {
 		];
 
 		for (const outFileOptions of outFileOptionsList) {
-			const outputRoot = compiler.compile<postcss.Root>(
+			const outputRoot = compiler.compile<any>(
 				inputRoot,
 				outFileOptions.compileOptions,
-				new PostcssCssDriver(),
+				cssDriver,
 			);
 			fs.writeFileSync(outFileOptions.filePath, outputRoot.toResult().css);
 		}
-	}
-
-	private parseCssFile(cssFilePath: string): postcss.Root {
-		const css = fs.readFileSync(cssFilePath);
-		const cssRoot = postcss.parse(css);
-		return cssRoot;
 	}
 
 	private createOutputFilePath(

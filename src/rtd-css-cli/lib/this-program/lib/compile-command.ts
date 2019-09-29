@@ -1,5 +1,6 @@
+import { FileCompiler } from '../../../../rtd-css';
+import { PostcssCssDriver } from '../../../../postcss-rtd-css';
 import { Cli } from '../../cli';
-import { FileCompiler } from '../../file-compiler';
 
 interface CompileCommandInputData extends Cli.CommandInputData {
 	inputFilePath: string;
@@ -57,6 +58,6 @@ export class CompileCommand extends Cli.Command<CompileCommandInputData> {
 
 	protected actionBody(inputData: CompileCommandInputData): void {
 		const compiler = new FileCompiler();
-		compiler.compile(inputData.inputFilePath, inputData.outputDirectoryPath);
+		compiler.compile(inputData.inputFilePath, inputData.outputDirectoryPath, new PostcssCssDriver());
 	}
 }
