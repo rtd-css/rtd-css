@@ -27,7 +27,6 @@
 	"main": "./lib/index.cjs.js",
 	"module": "./lib/index.es.mjs",
 	"scripts": {
-		"postinstall": "npm link rtd-css",
 		"pre-commit": "run-s format:fix lint",
 		"build": "run-s build:remove-src-js build:ts build:remove-src-js build:remove-lib build:rollup",
 		"build-and-test": "run-s build test",
