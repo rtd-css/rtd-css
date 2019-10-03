@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import fsExtra from 'fs-extra';
 import { CssDriver } from '../../css-driver';
 import { CssCompiler } from './css-compiler';
 import { Options } from './options';
@@ -8,9 +9,9 @@ export class FileCompiler {
 	private static readonly cssNamespaceExt = '.rtd';
 
 	compile(inputFilePath: string, outputDirectoryPath: string, cssDriver: CssDriver): void {
-		const inputRoot = cssDriver.parseCssToSourceRoot(
-			fs.readFileSync(inputFilePath),
-		);
+		fsExtra.ensureDirSync(outputDirectoryPath);
+
+		const inputRoot = cssDriver.parseCssToSourceRoot(fs.readFileSync(inputFilePath));
 
 		const compiler = new CssCompiler();
 		const config = compiler.loadConfig(inputRoot, cssDriver);
@@ -38,12 +39,8 @@ export class FileCompiler {
 		];
 
 		for (const outFileOptions of outFileOptionsList) {
-			const outputRoot = compiler.compile<any>(
-				inputRoot,
-				outFileOptions.compileOptions,
-				cssDriver,
-			);
-			fs.writeFileSync(outFileOptions.filePath, outputRoot.toResult().css);
+			const outputResult = compiler.compile<any>(inputRoot, outFileOptions.compileOptions, cssDriver);
+			fs.writeFileSync(outFileOptions.filePath, outputResult.css);
 		}
 	}
 

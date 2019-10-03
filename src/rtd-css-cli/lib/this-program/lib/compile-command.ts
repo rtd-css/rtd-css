@@ -1,3 +1,4 @@
+import fsExtra from 'fs-extra';
 import { FileCompiler } from '../../../../rtd-css';
 import { PostcssCssDriver } from '../../../../postcss-rtd-css';
 import { Cli } from '../../cli';
@@ -38,11 +39,31 @@ export class CompileCommand extends Cli.Command<CompileCommandInputData> {
 
 	protected validateAndGetInputData(argv: Cli.CliArgv): CompileCommandInputData {
 		if (
+			!Cli.CommandUtils.validateOptionListNotEmpty(this.program, argv, [
+				this.inputCssFileOption,
+				this.outputDirectoryOption,
+			])
+		) {
+			return;
+		}
+
+		const inputData = <CompileCommandInputData>{
+			inputFilePath: argv[this.inputCssFileOption.name],
+			outputDirectoryPath: argv[this.outputDirectoryOption.name],
+		};
+
+		try {
+			fsExtra.ensureDirSync(inputData.outputDirectoryPath);
+		} catch (e) {
+			this.program.printer.showCommandHelpWithSingleError(
+				this.outputDirectoryOption,
+				`Can not create directory "${inputData.outputDirectoryPath}"`,
+			);
+			return;
+		}
+
+		if (
 			!(
-				Cli.CommandUtils.validateOptionListNotEmpty(this.program, argv, [
-					this.inputCssFileOption,
-					this.outputDirectoryOption,
-				]) &&
 				Cli.CommandUtils.validateFileExists(this.program, argv, this.inputCssFileOption) &&
 				Cli.CommandUtils.validateDirectoryExists(this.program, argv, this.outputDirectoryOption)
 			)
@@ -50,10 +71,7 @@ export class CompileCommand extends Cli.Command<CompileCommandInputData> {
 			return;
 		}
 
-		return <CompileCommandInputData>{
-			inputFilePath: argv[this.inputCssFileOption.name],
-			outputDirectoryPath: argv[this.outputDirectoryOption.name],
-		};
+		return inputData;
 	}
 
 	protected actionBody(inputData: CompileCommandInputData): void {

@@ -1,3 +1,3 @@
-export { CssDriver, TypedCssDriver, CssTree } from './css-driver';
-export { postcssRtdCssPlugin, PostcssCssDriver } from './postcss-rtd-css';
+export { CssDriver, TypedCssDriver, CssTree, CssResult } from './css-driver';
+export { postcssRtdCssPlugin, PostcssCssDriver, PostcssCssResult } from './postcss-rtd-css';
 export { FileCompiler, CssCompiler, Options } from './rtd-css';

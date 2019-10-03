@@ -7,7 +7,7 @@ const postcssRtdCssPlugin = postcss.plugin<Options>(
 	(opts: Options): postcss.Transformer => {
 		return (root: postcss.Root, result: postcss.Result): Promise<any> | any => {
 			const compiler = new CssCompiler();
-			result.root = compiler.compile<postcss.Root>(result.root, opts, new PostcssCssDriver());
+			result.root = compiler.compile<postcss.Root>(result.root, opts, new PostcssCssDriver()).cssRoot;
 		};
 	},
 );

@@ -1,4 +1,5 @@
 import { CssTree } from './css-tree';
+import { CssResult } from './css-result';
 
 export interface CssDriver {
 	createRoot(sourceRoot?: any): CssTree.Root;
@@ -17,16 +18,13 @@ export interface CssDriver {
 
 	parseCssToSourceRoot(css: string | Buffer): any;
 
+	createResult(sourceRoot: any): CssResult<any>;
+
 	prettify(sourceRoot: any): any;
 }
 
-export interface TypedCssDriver<
-	TSourceRoot,
-	TSourceAtRule,
-	TSourceRule,
-	TSourceDeclaration,
-	TSourceComment,
-> extends CssDriver {
+export interface TypedCssDriver<TSourceRoot, TSourceAtRule, TSourceRule, TSourceDeclaration, TSourceComment>
+	extends CssDriver {
 	createRoot(sourceRoot?: TSourceRoot): CssTree.Root;
 
 	createAtRule(sourceAtRule?: TSourceAtRule): CssTree.AtRule;
@@ -42,6 +40,8 @@ export interface TypedCssDriver<
 	rootToSourceRoot(root: CssTree.Root): TSourceRoot;
 
 	parseCssToSourceRoot(css: string | Buffer): TSourceRoot;
+
+	createResult(sourceRoot: TSourceRoot): CssResult<TSourceRoot>;
 
 	prettify(sourceRoot: TSourceRoot): TSourceRoot;
 }

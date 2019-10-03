@@ -1,15 +1,11 @@
 import postcss from 'postcss';
 import postcssPrettify from '../../../../third-party/postcss-prettify';
-import { TypedCssDriver, CssTree } from '../../../../css-driver';
+import { TypedCssDriver, CssTree, CssResult } from '../../../../css-driver';
 import { PostcssCssTree } from './postcss-css-tree';
+import { PostcssCssResult } from './postcss-css-result';
 
-export class PostcssCssDriver implements TypedCssDriver<
-	postcss.Root,
-	postcss.AtRule,
-	postcss.Rule,
-	postcss.Declaration,
-	postcss.Comment
-> {
+export class PostcssCssDriver
+	implements TypedCssDriver<postcss.Root, postcss.AtRule, postcss.Rule, postcss.Declaration, postcss.Comment> {
 	createRoot(sourceRoot?: postcss.Root): CssTree.Root {
 		return new PostcssCssTree.Root(sourceRoot || postcss.root());
 	}
@@ -40,6 +36,10 @@ export class PostcssCssDriver implements TypedCssDriver<
 
 	parseCssToSourceRoot(css: string | Buffer): postcss.Root {
 		return postcss.parse(css);
+	}
+
+	createResult(sourceRoot: postcss.Root): CssResult<postcss.Root> {
+		return new PostcssCssResult(sourceRoot);
 	}
 
 	prettify(sourceRoot: postcss.Root): postcss.Root {
