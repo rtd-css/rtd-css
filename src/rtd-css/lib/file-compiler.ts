@@ -4,11 +4,12 @@ import fsExtra from 'fs-extra';
 import { CssDriver } from '../../css-driver';
 import { CssCompiler } from './css-compiler';
 import { Options } from './options';
+import { defaultCssDriver } from './default-css-driver';
 
 export class FileCompiler {
 	private static readonly cssNamespaceExt = '.rtd';
 
-	compile(inputFilePath: string, outputDirectoryPath: string, cssDriver: CssDriver): void {
+	compile(inputFilePath: string, outputDirectoryPath: string, cssDriver: CssDriver = defaultCssDriver): void {
 		fsExtra.ensureDirSync(outputDirectoryPath);
 
 		const inputRoot = cssDriver.parseCssToSourceRoot(fs.readFileSync(inputFilePath));

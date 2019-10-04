@@ -2,9 +2,14 @@ import { CssDriver, CssResult } from '../../css-driver';
 import { Options } from './options';
 import { LowLevelCompiler } from './low-level-compiler';
 import { ConfigModule } from './config';
+import { defaultCssDriver } from './default-css-driver';
 
 export class CssCompiler {
-	compile<TCssRoot>(inputCss: string | TCssRoot, options: Options, cssDriver: CssDriver): CssResult<TCssRoot> {
+	compile<TCssRoot>(
+		inputCss: string | TCssRoot,
+		options: Options = null,
+		cssDriver: CssDriver = defaultCssDriver,
+	): CssResult<TCssRoot> {
 		const inCssRoot = this.inputCssToCssRoot<TCssRoot>(inputCss, cssDriver);
 		const inCompilerCssRoot = cssDriver.sourceRootToRoot(inCssRoot);
 
@@ -23,14 +28,17 @@ export class CssCompiler {
 		return outCssResult;
 	}
 
-	loadConfig<TCssRoot>(inputCss: string | TCssRoot, cssDriver: CssDriver): ConfigModule.Config {
+	loadConfig<TCssRoot>(inputCss: string | TCssRoot, cssDriver: CssDriver = defaultCssDriver): ConfigModule.Config {
 		const inCssRoot = this.inputCssToCssRoot<TCssRoot>(inputCss, cssDriver);
 		const lowLevelCompiler = new LowLevelCompiler();
 		const config = lowLevelCompiler.loadConfig(cssDriver.sourceRootToRoot(inCssRoot));
 		return config;
 	}
 
-	private inputCssToCssRoot<TCssRoot>(inputCss: string | TCssRoot, cssDriver: CssDriver): TCssRoot {
+	private inputCssToCssRoot<TCssRoot>(
+		inputCss: string | TCssRoot,
+		cssDriver: CssDriver = defaultCssDriver,
+	): TCssRoot {
 		let cssRoot: TCssRoot;
 
 		if (typeof inputCss === 'string') {
