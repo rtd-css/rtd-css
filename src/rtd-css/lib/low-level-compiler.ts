@@ -3,6 +3,7 @@ import { MediaQuery } from '../../core-lib/media-query';
 import { CssDriver, CssTree } from '../../css-driver';
 import { Options } from './options';
 import { InputConfigModule, ConfigModule, ConfigBuilderModule } from './config';
+import { DeviceExpandingInputConfigModule, DeviceExpandingScriptConfigModule } from './device-expanding-config';
 import { MediaQueryToDevices } from './media-query-to-devices';
 import { DeviceMediaQuery } from './device-media-query';
 import { PassedQuery_Passed, PassedQuery_QueryType } from './media-query-passer';
@@ -103,30 +104,27 @@ export class LowLevelCompiler {
 		newParent: CssTree.ContainerBase,
 		parentDevice: ConfigModule.Device | LowLevelCompiler.UnknownDevice | null,
 	): void {
-		const mediaQueryList =
-			MediaQueryToDevices.mediaQueryToDeviceMediaQueries(this._config, mediaAtRule.params);
+		const mediaQueryList = MediaQueryToDevices.mediaQueryToDeviceMediaQueries(this._config, mediaAtRule.params);
 
 		if (parentDevice) {
-
 			if (parentDevice instanceof LowLevelCompiler.UnknownDevice) {
-				this.processUnknownDeviceMediaAtRule(mediaAtRule, newParent, parentDevice as LowLevelCompiler.UnknownDevice);
+				this.processUnknownDeviceMediaAtRule(
+					mediaAtRule,
+					newParent,
+					parentDevice as LowLevelCompiler.UnknownDevice,
+				);
 			} else if (parentDevice instanceof ConfigModule.Device) {
 				const mediaQuery = mediaQueryList.byDeviceNameOne.get(parentDevice.name);
 				this.processDeviceMediaAtRule(mediaAtRule, newParent, mediaQuery);
 			} else {
 				throw new NotImplementedError();
 			}
-
 		} else {
-
-			mediaQueryList.each(
-				(mediaQuery) => {
-					this.processDeviceMediaAtRule(mediaAtRule, newParent, mediaQuery);
-				},
-			);
+			mediaQueryList.each(mediaQuery => {
+				this.processDeviceMediaAtRule(mediaAtRule, newParent, mediaQuery);
+			});
 
 			this.processUnknownDeviceMediaAtRule(mediaAtRule, newParent, LowLevelCompiler.UnknownDevice.instance);
-
 		}
 	}
 
@@ -154,11 +152,7 @@ export class LowLevelCompiler {
 				break;
 			}
 			case PassedQuery_Passed.Passed: {
-				this.processMediaAtRuleWithMediaQuery_passed(
-					mediaAtRule,
-					newParent,
-					mediaQuery,
-				);
+				this.processMediaAtRuleWithMediaQuery_passed(mediaAtRule, newParent, mediaQuery);
 				break;
 			}
 			default: {
@@ -208,10 +202,7 @@ export class LowLevelCompiler {
 		}
 	}
 
-	computeDeviceSelector(
-		baseSelector: string,
-		device: ConfigModule.Device | LowLevelCompiler.UnknownDevice,
-	): string {
+	computeDeviceSelector(baseSelector: string, device: ConfigModule.Device | LowLevelCompiler.UnknownDevice): string {
 		let deviceSelector: string;
 
 		if (this._options.compileOnlyThisDevice) {
@@ -246,17 +237,6 @@ export class LowLevelCompiler {
 		const clonedContainer = container.clone();
 		clonedContainer.removeAll();
 		return clonedContainer;
-	}
-
-	loadConfig(root: CssTree.Root): ConfigModule.Config {
-		const configString = this.loadConfigString(root);
-		const inputConfig = InputConfigModule.ConfigParser.parse(configString);
-		const config = (new ConfigBuilderModule.ConfigBuilder())
-			.setUnits(inputConfig.units)
-			.setUnknownDevice(inputConfig.unknownDevice)
-			.setDeviceList(inputConfig.deviceList)
-			.createConfig();
-		return config;
 	}
 
 	loadConfigString(root: CssTree.Root, removeConfigDecl: boolean = false): string {
@@ -298,6 +278,33 @@ export class LowLevelCompiler {
 
 	removeConfigDecl(root: CssTree.Root): void {
 		this.loadConfigString(root, true);
+	}
+
+	createConfigExporter(root: CssTree.Root): DeviceExpandingInputConfigModule.ConfigExporter {
+		const configString = this.loadConfigString(root);
+		const expandingInputConfig = DeviceExpandingInputConfigModule.ConfigParser.parse(configString);
+		const expandingInputConfigExporter = new DeviceExpandingInputConfigModule.ConfigExporter(expandingInputConfig);
+
+		return expandingInputConfigExporter;
+	}
+
+	loadConfig(root: CssTree.Root): ConfigModule.Config {
+		const configExporter = this.createConfigExporter(root);
+		const inputConfig = configExporter.exportToBaseConfig();
+		const config = new ConfigBuilderModule.ConfigBuilder()
+			.setUnits(inputConfig.units)
+			.setUnknownDevice(inputConfig.unknownDevice)
+			.setDeviceList(inputConfig.deviceList)
+			.createConfig();
+
+		return config;
+	}
+
+	loadScriptConfig(root: CssTree.Root): DeviceExpandingScriptConfigModule.Config {
+		const configExporter = this.createConfigExporter(root);
+		const scriptConfig = configExporter.exportToScriptConfig();
+
+		return scriptConfig;
 	}
 }
 

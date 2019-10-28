@@ -6,14 +6,13 @@ import { RawOptionsData } from './data/raw-options-data';
 import { TokensData } from './data/tokens-data';
 
 export module OptionsParser {
-
 	export function parse<TResult>(string: string, schema: DataSchema_): TResult {
-		const tokensData = (new StringToTokensDataTransformer()).transform(string);
-		const rawOptionsData = (new TokensDataToRawOptionsDataTransformer()).transform(tokensData);
-		const data = (new RawOptionsDataToDataTransformer()).transform(rawOptionsData, schema);
+		const tokensData = new StringToTokensDataTransformer().transform(string);
+		const rawOptionsData = new TokensDataToRawOptionsDataTransformer().transform(tokensData);
+		const data = new RawOptionsDataToDataTransformer().transform(rawOptionsData, schema);
+
 		return data;
 	}
 
 	export class DataSchema extends DataSchema_ {}
-
 }

@@ -1,0 +1,23 @@
+@media all {
+	html.rtd-mobile .left-bar {
+		display: none;
+	}
+}
+
+@media all and (max-width: 767px) {
+	html.rtd-unknown .left-bar {
+		display: none;
+	}
+}
+
+@media screen and (min-width: 320px) {
+	html.rtd-mobile .test {
+		color: orange;
+	}
+}
+
+@media screen and (min-width: 320px) and (max-width: 767px) {
+	html.rtd-unknown .test {
+		color: orange;
+	}
+}

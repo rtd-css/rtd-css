@@ -4,10 +4,7 @@ import { RawOptionsData } from '../data/raw-options-data';
 import { DataSchema } from '../data/data-schema';
 
 export class RawOptionsDataToDataTransformer {
-	transform(
-		rawOptionsData: RawOptionsData,
-		schema: DataSchema,
-	): any {
+	transform(rawOptionsData: RawOptionsData, schema: DataSchema): any {
 		const result = {};
 		const clonedRawOptionsData = deepClone(rawOptionsData);
 		this.transformOptionList(
@@ -23,40 +20,32 @@ export class RawOptionsDataToDataTransformer {
 
 	private transformOptionList<
 		TRawOption extends RawOptionsData.BaseRawOption,
-		TOptionSchema extends DataSchema.BaseOptionSchema,
-		>(
+		TOptionSchema extends DataSchema.BaseOptionSchema
+	>(
 		toObject: any,
 		rawOptions: RawOptionsData.BaseRawOptionIndexedList<TRawOption>,
 		optionSchemas: DataSchema.BaseOptionSchemaIndexedList<TOptionSchema>,
 		transformRawOptionFunc: (rawOption: TRawOption, optionSchema: TOptionSchema) => any,
 	): void {
-		optionSchemas.each(
-			(curOptionSchema) => {
-				this.transformOption(toObject, rawOptions, curOptionSchema, transformRawOptionFunc);
-				rawOptions.byNameMany.removeAll(curOptionSchema.name);
-			},
-		);
+		optionSchemas.each(curOptionSchema => {
+			this.transformOption(toObject, rawOptions, curOptionSchema, transformRawOptionFunc);
+			rawOptions.byNameMany.removeAll(curOptionSchema.name);
+		});
 
 		if (rawOptions.any()) {
 			throw new Error(`Unexpected option with name "${rawOptions.first().name}"`);
 		}
 	}
 
-	private setOptionToObject(
-		toObject: any,
-		optionValue: any,
-		optionSchema: DataSchema.BaseOptionSchema,
-	): void {
+	private setOptionToObject(toObject: any, optionValue: any, optionSchema: DataSchema.BaseOptionSchema): void {
 		const propertyName = optionSchema.bindingToData.optionToProperty;
-		toObject[propertyName] = optionSchema.transformFunc
-			? optionSchema.transformFunc(optionValue)
-			: optionValue;
+		toObject[propertyName] = optionSchema.transformFunc ? optionSchema.transformFunc(optionValue) : optionValue;
 	}
 
 	private transformOption<
 		TRawOption extends RawOptionsData.BaseRawOption,
-		TOptionSchema extends DataSchema.BaseOptionSchema,
-		>(
+		TOptionSchema extends DataSchema.BaseOptionSchema
+	>(
 		toObject: any,
 		rawOptions: RawOptionsData.BaseRawOptionIndexedList<TRawOption>,
 		optionSchema: TOptionSchema,
@@ -95,10 +84,7 @@ export class RawOptionsDataToDataTransformer {
 		}
 	}
 
-	private transformOptionItem(
-		rawOption: RawOptionsData.RawOption,
-		optionSchema: DataSchema.OptionSchema,
-	): any {
+	private transformOptionItem(rawOption: RawOptionsData.RawOption, optionSchema: DataSchema.OptionSchema): any {
 		let result: any;
 
 		if (!optionSchema.subOptionSchemas.any()) {
@@ -132,21 +118,13 @@ export class RawOptionsDataToDataTransformer {
 		return result;
 	}
 
-	private applyValueBindingToDataIfExists(
-		value: any,
-		optionSchema: DataSchema.BaseOptionSchema,
-	): any {
+	private applyValueBindingToDataIfExists(value: any, optionSchema: DataSchema.BaseOptionSchema): any {
 		const valueBindingToData = optionSchema.valueSchema.bindingToData;
-		const result: any = valueBindingToData
-			? { [valueBindingToData.valueToProperty]: value }
-			: value;
+		const result: any = valueBindingToData ? { [valueBindingToData.valueToProperty]: value } : value;
 		return result;
 	}
 
-	private transformValue(
-		rawOption: RawOptionsData.BaseRawOption,
-		optionSchema: DataSchema.BaseOptionSchema,
-	): any {
+	private transformValue(rawOption: RawOptionsData.BaseRawOption, optionSchema: DataSchema.BaseOptionSchema): any {
 		let result: any;
 
 		switch (optionSchema.valueSchema.format) {
@@ -162,6 +140,9 @@ export class RawOptionsDataToDataTransformer {
 				}
 				result = this.transformValueItem(rawOption.rawValues[0], optionSchema);
 				break;
+			case DataSchema.ValueFormat.MultipleValue:
+				result = this.transformValueItemList(rawOption.rawValues, optionSchema);
+				break;
 			default:
 				throw new NotImplementedError();
 		}
@@ -169,14 +150,10 @@ export class RawOptionsDataToDataTransformer {
 		return result;
 	}
 
-	private transformValueItem(
-		rawValue: RawOptionsData.RawValue,
-		optionSchema: DataSchema.BaseOptionSchema,
-	): any {
+	private transformValueItem(rawValue: RawOptionsData.RawValue, optionSchema: DataSchema.BaseOptionSchema): any {
 		let result: any;
 
 		switch (rawValue.type) {
-
 			case RawOptionsData.ValueType.Null:
 				result = null;
 				break;
@@ -197,9 +174,15 @@ export class RawOptionsDataToDataTransformer {
 
 			default:
 				throw new NotImplementedError();
-
 		}
 
 		return result;
+	}
+
+	private transformValueItemList(
+		rawValueList: RawOptionsData.RawValue[],
+		optionSchema: DataSchema.BaseOptionSchema,
+	): any {
+		return rawValueList.map(rawValue => this.transformValueItem(rawValue, optionSchema));
 	}
 }

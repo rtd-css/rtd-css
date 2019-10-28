@@ -75,7 +75,15 @@ export class CompileCommand extends Cli.Command<CompileCommandInputData> {
 	}
 
 	protected actionBody(inputData: CompileCommandInputData): void {
-		const compiler = new FileCompiler();
-		compiler.compile(inputData.inputFilePath, inputData.outputDirectoryPath, new PostcssCssDriver());
+		const compiler = new FileCompiler(
+			inputData.inputFilePath,
+			inputData.outputDirectoryPath,
+			new PostcssCssDriver(),
+		);
+
+		compiler.compile(<FileCompiler.OutputRequest>{
+			css: FileCompiler.OutputRequestCss.General,
+			js: FileCompiler.OutputRequestJs.GeneralAndDevices,
+		});
 	}
 }

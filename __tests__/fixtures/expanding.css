@@ -1,0 +1,20 @@
+html {
+	--rtd-config: --rtd-units 'px' --rtd-breakpoints 'mobile' '767' 'tablet' '1024' 'desktop' --rtd-unknown-device
+		[rtd-device-name] 'unknown' [rtd-device-class] 'rtd-unknown' --rtd-mobile-device [rtd-device-name] 'mobile'
+		[rtd-device-class] 'rtd-mobile' [rtd-device-breakpoints] 'mobile' '900' 'tablet' #rtd-none 'desktop'
+		--rtd-tablet-device [rtd-device-name] 'tablet' [rtd-device-class] 'rtd-tablet' [rtd-device-breakpoints] 'mobile'
+		'650' 'tablet' '1400' 'desktop' --rtd-desktop-device [rtd-device-name] 'desktop' [rtd-device-class]
+		'rtd-desktop' [rtd-device-breakpoints] 'mobile' #rtd-none 'tablet' '900' 'desktop';
+}
+
+@media (max-width: 767px) {
+	.left-bar {
+		display: none;
+	}
+}
+
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+	.test {
+		color: orange;
+	}
+}

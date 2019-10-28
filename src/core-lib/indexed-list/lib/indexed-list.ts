@@ -1,13 +1,24 @@
 import { IndexedListIndex } from './indexed-list-index';
 import { IndexedListIndexForFriends } from './indexed-list-index-for-friends';
+import { ListInIndexedList } from './list-in-indexed-list';
+import { ListInIndexedListForFriends } from './list-in-indexed-list-for-friends';
 
 export class IndexedList<TItem> {
 	private _indices: IndexedListIndex<TItem>[];
 	private _indicesForFriends: IndexedListIndexForFriends<TItem>[];
 
+	private _list: ListInIndexedList<TItem>;
+	private _listForFriends: ListInIndexedListForFriends<TItem>;
+	get list(): ListInIndexedList<TItem> {
+		return this._list;
+	}
+
 	constructor() {
 		this._indices = [];
 		this._indicesForFriends = [];
+
+		this._list = new ListInIndexedList<TItem>(this);
+		this._listForFriends = (this._list as any) as ListInIndexedListForFriends<TItem>;
 	}
 
 	each(callback: (item: TItem) => void): void {
@@ -30,12 +41,16 @@ export class IndexedList<TItem> {
 		for (const index of this._indicesForFriends) {
 			index._add(...items);
 		}
+
+		this._listForFriends._add(...items);
 	}
 
 	remove(...items: TItem[]): void {
 		for (const index of this._indicesForFriends) {
 			index._remove(...items);
 		}
+
+		this._listForFriends._remove(...items);
 	}
 
 	// Friends method

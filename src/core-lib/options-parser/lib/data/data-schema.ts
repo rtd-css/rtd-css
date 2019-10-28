@@ -10,10 +10,10 @@ export class DataSchema {
 }
 
 export module DataSchema {
-
 	export enum ValueFormat {
 		NoValue = 'NoValue',
 		SingleValue = 'SingleValue',
+		MultipleValue = 'MultipleValue',
 	}
 
 	export enum ValueType {
@@ -34,27 +34,26 @@ export module DataSchema {
 		format: ValueFormat;
 		type: ValueType;
 
-		private constructor(
-			bindingToData: ValueBindingToData,
-			format: ValueFormat,
-			type: ValueType,
-		) {
+		private constructor(bindingToData: ValueBindingToData, format: ValueFormat, type: ValueType) {
 			this.bindingToData = bindingToData;
 			this.format = format;
 			this.type = type;
 		}
 
-		static createNoValue(
-			bindingToData: ValueBindingToData,
-		): ValueSchema {
+		static createEx(bindingToData: ValueBindingToData, format: ValueFormat, type: ValueType): ValueSchema {
+			return new ValueSchema(bindingToData, format, type);
+		}
+
+		static createNoValue(bindingToData: ValueBindingToData): ValueSchema {
 			return new ValueSchema(bindingToData, ValueFormat.NoValue, null);
 		}
 
-		static createSingleValue(
-			bindingToData: ValueBindingToData,
-			valueType: ValueType,
-		): ValueSchema {
+		static createSingleValue(bindingToData: ValueBindingToData, valueType: ValueType): ValueSchema {
 			return new ValueSchema(bindingToData, ValueFormat.SingleValue, valueType);
+		}
+
+		static createMultipleValue(bindingToData: ValueBindingToData, valueType: ValueType): ValueSchema {
+			return new ValueSchema(bindingToData, ValueFormat.MultipleValue, valueType);
 		}
 	}
 
@@ -68,9 +67,7 @@ export module DataSchema {
 	export class OptionBindingToData {
 		optionToProperty: string;
 
-		constructor(
-			optionToProperty: string,
-		) {
+		constructor(optionToProperty: string) {
 			this.optionToProperty = optionToProperty;
 		}
 	}
@@ -112,14 +109,7 @@ export module DataSchema {
 			subOptionSchemas: SubOptionSchema[],
 			transformFunc: OptionTransformFunc = null,
 		) {
-			super(
-				name,
-				bindingToData,
-				type,
-				valueSchema,
-				required,
-				transformFunc,
-			);
+			super(name, bindingToData, type, valueSchema, required, transformFunc);
 
 			this.subOptionSchemas = new SubOptionSchemaIndexedList();
 			subOptionSchemas && this.subOptionSchemas.add(...subOptionSchemas);
@@ -128,8 +118,9 @@ export module DataSchema {
 
 	export class SubOptionSchema extends BaseOptionSchema {}
 
-	export class BaseOptionSchemaIndexedList<TOptionSchema extends BaseOptionSchema>
-		extends BaseOptionIndexedList<TOptionSchema> {}
+	export class BaseOptionSchemaIndexedList<TOptionSchema extends BaseOptionSchema> extends BaseOptionIndexedList<
+		TOptionSchema
+	> {}
 
 	export class OptionSchemaIndexedList extends BaseOptionSchemaIndexedList<OptionSchema> {}
 
@@ -138,6 +129,7 @@ export module DataSchema {
 	export class SchemaFactory {
 		private createValueOptionEx(
 			optionOrSubOption: boolean,
+			valueFormat: ValueFormat,
 			valueType: ValueType,
 			name: string,
 			optionToProperty: string,
@@ -146,12 +138,15 @@ export module DataSchema {
 		): OptionSchema | SubOptionSchema {
 			let optionSchema: OptionSchema | SubOptionSchema;
 
+			const bindingToData = new OptionBindingToData(optionToProperty);
+			const valueSchema = ValueSchema.createEx(null, valueFormat, valueType);
+
 			if (optionOrSubOption) {
 				optionSchema = new OptionSchema(
 					name,
-					new OptionBindingToData(optionToProperty),
+					bindingToData,
 					OptionType.Single,
-					ValueSchema.createSingleValue(null, valueType),
+					valueSchema,
 					required,
 					null,
 					transformFunc,
@@ -159,9 +154,9 @@ export module DataSchema {
 			} else {
 				optionSchema = new SubOptionSchema(
 					name,
-					new OptionBindingToData(optionToProperty),
+					bindingToData,
 					OptionType.Single,
-					ValueSchema.createSingleValue(null, valueType),
+					valueSchema,
 					required,
 					transformFunc,
 				);
@@ -176,13 +171,35 @@ export module DataSchema {
 			required: boolean,
 			transformFunc: OptionTransformFunc = null,
 		): OptionSchema {
-			return <OptionSchema>this.createValueOptionEx(
-				true,
-				ValueType.String,
-				name,
-				optionToProperty,
-				required,
-				transformFunc,
+			return <OptionSchema>(
+				this.createValueOptionEx(
+					true,
+					ValueFormat.SingleValue,
+					ValueType.String,
+					name,
+					optionToProperty,
+					required,
+					transformFunc,
+				)
+			);
+		}
+
+		createStringArrayOption(
+			name: string,
+			optionToProperty: string,
+			required: boolean,
+			transformFunc: OptionTransformFunc = null,
+		): OptionSchema {
+			return <OptionSchema>(
+				this.createValueOptionEx(
+					true,
+					ValueFormat.MultipleValue,
+					ValueType.String,
+					name,
+					optionToProperty,
+					required,
+					transformFunc,
+				)
 			);
 		}
 
@@ -192,13 +209,35 @@ export module DataSchema {
 			required: boolean,
 			transformFunc: OptionTransformFunc = null,
 		): SubOptionSchema {
-			return <SubOptionSchema>this.createValueOptionEx(
-				false,
-				ValueType.String,
-				name,
-				optionToProperty,
-				required,
-				transformFunc,
+			return <SubOptionSchema>(
+				this.createValueOptionEx(
+					false,
+					ValueFormat.SingleValue,
+					ValueType.String,
+					name,
+					optionToProperty,
+					required,
+					transformFunc,
+				)
+			);
+		}
+
+		createStringArraySubOption(
+			name: string,
+			optionToProperty: string,
+			required: boolean,
+			transformFunc: OptionTransformFunc = null,
+		): SubOptionSchema {
+			return <SubOptionSchema>(
+				this.createValueOptionEx(
+					false,
+					ValueFormat.MultipleValue,
+					ValueType.String,
+					name,
+					optionToProperty,
+					required,
+					transformFunc,
+				)
 			);
 		}
 
@@ -208,13 +247,16 @@ export module DataSchema {
 			required: boolean,
 			transformFunc: OptionTransformFunc = null,
 		): OptionSchema {
-			return <OptionSchema>this.createValueOptionEx(
-				true,
-				ValueType.Float,
-				name,
-				optionToProperty,
-				required,
-				transformFunc,
+			return <OptionSchema>(
+				this.createValueOptionEx(
+					true,
+					ValueFormat.SingleValue,
+					ValueType.Float,
+					name,
+					optionToProperty,
+					required,
+					transformFunc,
+				)
 			);
 		}
 
@@ -224,13 +266,16 @@ export module DataSchema {
 			required: boolean,
 			transformFunc: OptionTransformFunc = null,
 		): SubOptionSchema {
-			return <SubOptionSchema>this.createValueOptionEx(
-				false,
-				ValueType.Float,
-				name,
-				optionToProperty,
-				required,
-				transformFunc,
+			return <SubOptionSchema>(
+				this.createValueOptionEx(
+					false,
+					ValueFormat.SingleValue,
+					ValueType.Float,
+					name,
+					optionToProperty,
+					required,
+					transformFunc,
+				)
 			);
 		}
 
@@ -270,7 +315,7 @@ export module DataSchema {
 			);
 		}
 
-		createObjectArrayOption(
+		createObjectMultipleOption(
 			name: string,
 			optionToProperty: string,
 			required: boolean,
@@ -287,5 +332,4 @@ export module DataSchema {
 			);
 		}
 	}
-
 }

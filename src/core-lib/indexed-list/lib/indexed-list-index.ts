@@ -1,11 +1,10 @@
+import { IndexedListFriend } from './indexed-list-friend';
 import { IndexedList } from './indexed-list';
 import { IndexedListForFriends } from './indexed-list-for-friends';
 
-export abstract class IndexedListIndex<TItem> {
+export abstract class IndexedListIndex<TItem> extends IndexedListFriend<TItem> {
 	private _dictByKey: { [key: string]: TItem[] };
 
-	private _indexedList: IndexedList<TItem>;
-	private _indexedListForFriends: IndexedListForFriends<TItem>;
 	private _keyFunc: (item: TItem) => string;
 	private _allowDuplicates: boolean;
 
@@ -14,10 +13,10 @@ export abstract class IndexedListIndex<TItem> {
 		keyFunc: (item: TItem) => string,
 		allowDuplicates: boolean = false,
 	) {
+		super(indexedList);
+
 		this._dictByKey = {};
 
-		this._indexedList = indexedList;
-		this._indexedListForFriends = (indexedList as any) as IndexedListForFriends<TItem>;
 		this._keyFunc = keyFunc;
 		this._allowDuplicates = allowDuplicates;
 
@@ -35,9 +34,7 @@ export abstract class IndexedListIndex<TItem> {
 
 	map<TResultItem>(callback: (item: TItem) => TResultItem): TResultItem[] {
 		const result: TResultItem[] = [];
-		this.each(
-			item => result.push(callback(item)),
-		);
+		this.each(item => result.push(callback(item)));
 		return result;
 	}
 
@@ -57,7 +54,7 @@ export abstract class IndexedListIndex<TItem> {
 
 	protected _getAll(queryKey: string): ReadonlyArray<TItem> {
 		if (!this._dictByKey.hasOwnProperty(queryKey)) {
-			throw new Error('Items with such ket not found');
+			throw new Error('Items with such key not found');
 		}
 		return this._dictByKey[queryKey];
 	}
@@ -116,8 +113,8 @@ export abstract class IndexedListIndex<TItem> {
 			const itemsWithSuchKey: TItem[] = this._dictByKey[key];
 			let curItemIndex: number;
 			if (
-				!itemsWithSuchKey
-				|| (curItemIndex = itemsWithSuchKey.findIndex(_item => this._keyFunc(_item) === key)) < 0
+				!itemsWithSuchKey ||
+				(curItemIndex = itemsWithSuchKey.findIndex(_item => this._keyFunc(_item) === key)) < 0
 			) {
 				throw new Error('Can not remove item with such key because such item not found');
 			}

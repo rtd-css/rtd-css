@@ -23,22 +23,22 @@ export module InputConfigModule {
 	export module ConfigParser {
 		const schemaFactory = new OptionsParser.DataSchema.SchemaFactory();
 
-		const schema = new OptionsParser.DataSchema(
-			[
-				schemaFactory.createStringOption('rtd-units', 'units', true),
-				schemaFactory.createObjectOption('rtd-unknown-device', 'unknownDevice', true, [
-					schemaFactory.createStringSubOption('rtd-device-name', 'name', true),
-					schemaFactory.createStringSubOption('rtd-device-class', 'cssClass', true),
-				]),
-				schemaFactory.createObjectArrayOption('rtd-device', 'deviceList', true, [
-					schemaFactory.createStringSubOption('rtd-device-name', 'name', true),
-					schemaFactory.createStringSubOption('rtd-device-class', 'cssClass', true),
-					schemaFactory.createFloatSubOption('rtd-device-max-width', 'maxWidth', true, value => (value === null) ? Infinity : value),
-					schemaFactory.createStringSubOption('rtd-device-merge-down-to', 'mergeDownTo', true),
-					schemaFactory.createStringSubOption('rtd-device-merge-up-to', 'mergeUpTo', true),
-				]),
-			],
-		);
+		const schema = new OptionsParser.DataSchema([
+			schemaFactory.createStringOption('rtd-units', 'units', true),
+			schemaFactory.createObjectOption('rtd-unknown-device', 'unknownDevice', true, [
+				schemaFactory.createStringSubOption('rtd-device-name', 'name', true),
+				schemaFactory.createStringSubOption('rtd-device-class', 'cssClass', true),
+			]),
+			schemaFactory.createObjectMultipleOption('rtd-device', 'deviceList', true, [
+				schemaFactory.createStringSubOption('rtd-device-name', 'name', true),
+				schemaFactory.createStringSubOption('rtd-device-class', 'cssClass', true),
+				schemaFactory.createFloatSubOption('rtd-device-max-width', 'maxWidth', true, value =>
+					value === null ? Infinity : value,
+				),
+				schemaFactory.createStringSubOption('rtd-device-merge-down-to', 'mergeDownTo', true),
+				schemaFactory.createStringSubOption('rtd-device-merge-up-to', 'mergeUpTo', true),
+			]),
+		]);
 
 		export function parse(string: string): InputConfigModule.Config {
 			const config = OptionsParser.parse<InputConfigModule.Config>(string, schema);
