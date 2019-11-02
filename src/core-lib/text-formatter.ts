@@ -130,6 +130,7 @@ export class TextFormatter {
 		return this.normalizeLineBreaks(text).split(TextFormatter.defaultLineBreak);
 	}
 
+	// tslint:disable-next-line:no-unused-variable
 	private splitToLines(): string[] {
 		return TextFormatter.splitToLines(this._text);
 	}

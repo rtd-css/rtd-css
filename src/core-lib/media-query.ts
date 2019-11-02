@@ -37,11 +37,7 @@ export class MediaQueryOrQueryAst {
 		return this._features;
 	}
 
-	constructor(
-		inverse: boolean = null,
-		type: string = null,
-		features: MediaQueryFeatureAst[] = null,
-	) {
+	constructor(inverse: boolean = null, type: string = null, features: MediaQueryFeatureAst[] = null) {
 		this.inverse = inverse;
 		this.type = type;
 		this._features = [];
@@ -51,7 +47,7 @@ export class MediaQueryOrQueryAst {
 	}
 
 	isEmpty(): boolean {
-		return !this.type && (this._features.length === 0);
+		return !this.type && this._features.length === 0;
 	}
 
 	addFeatures(...features: MediaQueryFeatureAst[]): void {
@@ -68,20 +64,18 @@ export class MediaQueryFeatureAst {
 	name: string;
 	value: CssValue;
 
-	constructor(
-		modifier: string = null,
-		name: string = null,
-		value: CssValue = null,
-	) {
+	constructor(modifier: string = null, name: string = null, value: CssValue = null) {
 		this.modifier = modifier;
 		this.name = name;
 		this.value = value;
 	}
 
 	isRangeFeatureInUnits(featureName: string, units: string): boolean {
-		return this.name === featureName
-			&& (this.modifier === 'min' || this.modifier === 'max')
-			&& (this.value.valueInUnits && this.value.valueInUnits.units === units);
+		return (
+			this.name === featureName &&
+			(this.modifier === 'min' || this.modifier === 'max') &&
+			(this.value.valueInUnits && this.value.valueInUnits.units === units)
+		);
 	}
 }
 
@@ -116,10 +110,7 @@ export class MqRangeFeatureSummaryForUnits {
 		return result;
 	}
 
-	static createHasRange(
-		featureName: string,
-		rangeInUnits: RangeInUnits,
-	): MqRangeFeatureSummaryForUnits {
+	static createHasRange(featureName: string, rangeInUnits: RangeInUnits): MqRangeFeatureSummaryForUnits {
 		MqRangeFeatureSummaryForUnits.validateFeatureName(featureName);
 
 		const result = new MqRangeFeatureSummaryForUnits();
@@ -135,13 +126,7 @@ export class MqRangeFeatureSummaryForUnits {
 		range: Range,
 		units: string,
 	): MqRangeFeatureSummaryForUnits {
-		return MqRangeFeatureSummaryForUnits.createHasRange(
-			featureName,
-			new RangeInUnits(
-				range,
-				units,
-			),
-		);
+		return MqRangeFeatureSummaryForUnits.createHasRange(featureName, new RangeInUnits(range, units));
 	}
 
 	private static validateFeatureName(featureName: string): void {
@@ -200,39 +185,43 @@ export class MediaQuery {
 	}
 
 	getRangeFeatureSummaries(featureName: string, units: string): MqRangeFeatureSummaryForUnits[] {
-		const rangeFeatureSummaryList = this.mediaQueryAst.orQueries.map(
-			(orQuery) => {
-				const ranges = orQuery.features
-					.filter(feature => feature.isRangeFeatureInUnits(featureName, units))
-					.map(
-						(feature) => {
-							let range: Range;
-							const value = feature.value.valueInUnits.value;
-							if (feature.modifier === 'min') {
-								range = new Range(value, Infinity);
-							} else {
-								range = new Range(-Infinity, value);
-							}
-							return range;
-						},
-					);
-
-				let rangeFeatureSummary: MqRangeFeatureSummaryForUnits;
-				if (ranges.length === 0) {
-					rangeFeatureSummary = MqRangeFeatureSummaryForUnits.createNoRange(featureName);
-				} else if (ranges.length === 1) {
-					rangeFeatureSummary = MqRangeFeatureSummaryForUnits.createHasRangeWithRangeAndUnits(featureName, ranges[0], units);
-				} else {
-					const totalRange = Range.intersect(...ranges);
-					if (totalRange) {
-						rangeFeatureSummary = MqRangeFeatureSummaryForUnits.createHasRangeWithRangeAndUnits(featureName, totalRange, units);
+		const rangeFeatureSummaryList = this.mediaQueryAst.orQueries.map(orQuery => {
+			const ranges = orQuery.features
+				.filter(feature => feature.isRangeFeatureInUnits(featureName, units))
+				.map(feature => {
+					let range: Range;
+					const value = feature.value.valueInUnits.value;
+					if (feature.modifier === 'min') {
+						range = new Range(value, Infinity);
 					} else {
-						rangeFeatureSummary = MqRangeFeatureSummaryForUnits.createEmptyRange(featureName);
+						range = new Range(-Infinity, value);
 					}
+					return range;
+				});
+
+			let rangeFeatureSummary: MqRangeFeatureSummaryForUnits;
+			if (ranges.length === 0) {
+				rangeFeatureSummary = MqRangeFeatureSummaryForUnits.createNoRange(featureName);
+			} else if (ranges.length === 1) {
+				rangeFeatureSummary = MqRangeFeatureSummaryForUnits.createHasRangeWithRangeAndUnits(
+					featureName,
+					ranges[0],
+					units,
+				);
+			} else {
+				const totalRange = Range.intersect(...ranges);
+				if (totalRange) {
+					rangeFeatureSummary = MqRangeFeatureSummaryForUnits.createHasRangeWithRangeAndUnits(
+						featureName,
+						totalRange,
+						units,
+					);
+				} else {
+					rangeFeatureSummary = MqRangeFeatureSummaryForUnits.createEmptyRange(featureName);
 				}
-				return rangeFeatureSummary;
-			},
-		);
+			}
+			return rangeFeatureSummary;
+		});
 
 		return rangeFeatureSummaryList;
 	}
@@ -258,53 +247,46 @@ export class MediaQuery {
 		const ast = new MediaQueryAst();
 
 		ast.addOrQueries(
-			...libAst.orQueries.map(
-				(orQuery) => {
-					const outOrQuery = new MediaQueryOrQueryAst();
-					outOrQuery.inverse = orQuery.inverse;
-					outOrQuery.type = orQuery.type;
-					outOrQuery.addFeatures(
-						...orQuery.expressions.map(
-							(feature) => {
-								const outFeature = new MediaQueryFeatureAst();
-								outFeature.modifier = feature.modifier;
-								outFeature.name = feature.feature;
-								outFeature.value = new CssValue(feature.value);
-								return outFeature;
-							},
-						),
-					);
-					return outOrQuery;
-				},
-			),
+			...libAst.orQueries.map(orQuery => {
+				const outOrQuery = new MediaQueryOrQueryAst();
+				outOrQuery.inverse = orQuery.inverse;
+				outOrQuery.type = orQuery.type;
+				outOrQuery.addFeatures(
+					...orQuery.expressions.map(feature => {
+						const outFeature = new MediaQueryFeatureAst();
+						outFeature.modifier = feature.modifier;
+						outFeature.name = feature.feature;
+						outFeature.value = new CssValue(feature.value);
+						return outFeature;
+					}),
+				);
+				return outOrQuery;
+			}),
 		);
 
 		return ast;
 	}
 
+	// tslint:disable-next-line:no-unused-variable
 	private astToLibAst(ast: MediaQueryAst): LibraryMediaQueryAst.MediaQueryAst {
 		const libAst = <LibraryMediaQueryAst.MediaQueryAst>{
-			orQueries: ast.orQueries.map(
-				(orQuery) => {
-					const outOrQuery = <LibraryMediaQueryAst.MediaQueryOrQueryAst>{
-						inverse: orQuery.inverse,
-						type: orQuery.type,
-						expressions: orQuery.features.map(
-							(feature) => {
-								const outFeature = <LibraryMediaQueryAst.MediaQueryFeatureAst>{
-									modifier: feature.modifier,
-									feature: feature.name,
-									value: feature.value.value,
-								};
+			orQueries: ast.orQueries.map(orQuery => {
+				const outOrQuery = <LibraryMediaQueryAst.MediaQueryOrQueryAst>{
+					inverse: orQuery.inverse,
+					type: orQuery.type,
+					expressions: orQuery.features.map(feature => {
+						const outFeature = <LibraryMediaQueryAst.MediaQueryFeatureAst>{
+							modifier: feature.modifier,
+							feature: feature.name,
+							value: feature.value.value,
+						};
 
-								return outFeature;
-							},
-						),
-					};
+						return outFeature;
+					}),
+				};
 
-					return outOrQuery;
-				},
-			),
+				return outOrQuery;
+			}),
 		};
 
 		return libAst;

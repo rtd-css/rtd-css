@@ -34,6 +34,18 @@ export class PostcssCssDriver
 		return (root as PostcssCssTree.Root).postcssRoot;
 	}
 
+	inputCssToSourceRoot(inputCss: string | postcss.Root): postcss.Root {
+		let sourceRoot: postcss.Root;
+
+		if (typeof inputCss === 'string') {
+			sourceRoot = this.parseCssToSourceRoot(inputCss);
+		} else {
+			sourceRoot = inputCss;
+		}
+
+		return sourceRoot;
+	}
+
 	parseCssToSourceRoot(css: string | Buffer): postcss.Root {
 		return postcss.parse(css);
 	}

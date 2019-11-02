@@ -54,6 +54,7 @@ export class IndexedList<TItem> {
 	}
 
 	// Friends method
+	// tslint:disable-next-line:no-unused-variable
 	private _addIndex(index: IndexedListIndex<TItem>): void {
 		this._indices.push(index);
 		this._indicesForFriends.push((index as any) as IndexedListIndexForFriends<TItem>);

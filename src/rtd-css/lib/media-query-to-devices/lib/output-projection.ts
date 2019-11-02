@@ -1,12 +1,12 @@
-import { deepClone } from '../../core-lib/deep-clone';
+import { deepClone } from '../../../../core-lib/deep-clone';
 import {
 	MediaQuery,
 	MqRangeFeatureSummaryForUnits,
 	MqRangeFeatureSummaryForUnitsType,
-} from '../../core-lib/media-query';
-import { Range } from '../../core-lib/range';
-import { ConfigModule } from './config';
-import { MediaQueryPasser, PassedMediaQuery } from './media-query-passer';
+} from '../../../../core-lib/media-query';
+import { Range } from '../../../../core-lib/range';
+import { ConfigModule } from '../../config';
+import { MediaQueryPasser, PassedMediaQuery } from '../../media-query-passer';
 import { InputProjection } from './input-projection';
 
 export class OutputProjection {
@@ -15,12 +15,10 @@ export class OutputProjection {
 }
 
 export module OutputProjection {
-
 	export class DeviceOutput {
 		device: ConfigModule.Device;
 		passedMediaQuery: PassedMediaQuery;
 	}
-
 }
 
 export class OutputProjectionBuilder {
@@ -53,12 +51,10 @@ export class OutputProjectionBuilder {
 	}
 
 	private computeDeviceOutputList(): OutputProjection.DeviceOutput[] {
-		const deviceOutputList = this._config.deviceList.map(
-			(device) => {
-				const deviceOutput = this.computeDeviceOutput(device);
-				return deviceOutput;
-			},
-		);
+		const deviceOutputList = this._config.deviceList.map(device => {
+			const deviceOutput = this.computeDeviceOutput(device);
+			return deviceOutput;
+		});
 
 		return deviceOutputList;
 	}
@@ -82,29 +78,26 @@ export class OutputProjectionBuilder {
 		let outputWidth: MqRangeFeatureSummaryForUnits;
 
 		if (
-			width.type === MqRangeFeatureSummaryForUnitsType.NoRange
-			|| width.type === MqRangeFeatureSummaryForUnitsType.EmptyRange
+			width.type === MqRangeFeatureSummaryForUnitsType.NoRange ||
+			width.type === MqRangeFeatureSummaryForUnitsType.EmptyRange
 		) {
 			outputWidth = width;
 		} else if (width.type === MqRangeFeatureSummaryForUnitsType.HasRange) {
-			let outputWidthRange = Range.intersect(
-				width.rangeInUnits.range,
-				device.widthRange,
-			);
+			let outputWidthRange = Range.intersect(width.rangeInUnits.range, device.widthRange);
 
 			if (!outputWidthRange) {
 				outputWidth = MqRangeFeatureSummaryForUnits.createEmptyRange('width');
 			} else {
 				outputWidthRange = new Range(
-					(outputWidthRange.from !== device.widthRange.from)
-						? outputWidthRange.from
-						: -Infinity,
-					(outputWidthRange.to !== device.widthRange.to)
-						? outputWidthRange.to
-						: Infinity,
+					outputWidthRange.from !== device.widthRange.from ? outputWidthRange.from : -Infinity,
+					outputWidthRange.to !== device.widthRange.to ? outputWidthRange.to : Infinity,
 				);
 
-				outputWidth = MqRangeFeatureSummaryForUnits.createHasRangeWithRangeAndUnits('width', outputWidthRange, this._config.units);
+				outputWidth = MqRangeFeatureSummaryForUnits.createHasRangeWithRangeAndUnits(
+					'width',
+					outputWidthRange,
+					this._config.units,
+				);
 			}
 		}
 

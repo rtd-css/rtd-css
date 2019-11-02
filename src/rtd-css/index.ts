@@ -1,3 +1,2 @@
-export { FileCompiler } from './lib/file-compiler';
-export { CssCompiler } from './lib/css-compiler';
-export { Options } from './lib/options';
+export { FileCompiler, FileCompilerOutputRequest } from './lib/file-compiler';
+export { CssCompiler, CssCompilerOptions } from './lib/css-compiler';

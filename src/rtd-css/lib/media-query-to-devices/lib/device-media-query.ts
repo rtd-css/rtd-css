@@ -1,5 +1,5 @@
-import { ConfigModule } from './config';
-import { PassedMediaQuery } from './media-query-passer';
+import { ConfigModule } from '../../config';
+import { PassedMediaQuery } from '../../media-query-passer';
 
 export class DeviceMediaQuery {
 	readonly device: ConfigModule.Device;

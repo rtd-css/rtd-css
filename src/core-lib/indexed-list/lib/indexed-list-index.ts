@@ -1,6 +1,5 @@
 import { IndexedListFriend } from './indexed-list-friend';
 import { IndexedList } from './indexed-list';
-import { IndexedListForFriends } from './indexed-list-for-friends';
 
 export abstract class IndexedListIndex<TItem> extends IndexedListFriend<TItem> {
 	private _dictByKey: { [key: string]: TItem[] };
@@ -39,6 +38,7 @@ export abstract class IndexedListIndex<TItem> extends IndexedListFriend<TItem> {
 	}
 
 	any(): boolean {
+		// tslint:disable-next-line:no-unused-variable
 		for (const key in this._dictByKey) {
 			return true;
 		}
@@ -73,6 +73,7 @@ export abstract class IndexedListIndex<TItem> extends IndexedListFriend<TItem> {
 	}
 
 	// Friends method
+	// tslint:disable-next-line:no-unused-variable
 	private _add(...items: TItem[]): void {
 		for (const curItem of items) {
 			if (!curItem) {
@@ -99,6 +100,7 @@ export abstract class IndexedListIndex<TItem> extends IndexedListFriend<TItem> {
 	}
 
 	// Friends method
+	// tslint:disable-next-line:no-unused-variable
 	private _remove(...items: TItem[]): void {
 		for (const curItem of items) {
 			if (!curItem) {

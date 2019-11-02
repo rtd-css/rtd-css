@@ -1,5 +1,5 @@
-import { MediaQuery, MqRangeFeatureSummaryForUnits } from '../../core-lib/media-query';
-import { ConfigModule } from './config';
+import { MediaQuery, MqRangeFeatureSummaryForUnits } from '../../../../core-lib/media-query';
+import { ConfigModule } from '../../config';
 
 export class InputProjection {
 	mediaQueryWithoutWidths: MediaQuery;

@@ -4,6 +4,7 @@
 		"exclude": ["**/node_modules/**"]
 	},
 	"rules": {
+		"no-unused-variable": true,
 		"max-line-length": [true, 140],
 		"indent": [true, "tabs", 4],
 		"ter-indent": [true, "tab", { "SwitchCase": 1 }],

@@ -16,6 +16,8 @@ export interface CssDriver {
 
 	rootToSourceRoot(root: CssTree.Root): any;
 
+	inputCssToSourceRoot(inputCss: string | any): any;
+
 	parseCssToSourceRoot(css: string | Buffer): any;
 
 	createResult(sourceRoot: any): CssResult<any>;
@@ -38,6 +40,8 @@ export interface TypedCssDriver<TSourceRoot, TSourceAtRule, TSourceRule, TSource
 	sourceRootToRoot(sourceRoot: TSourceRoot): CssTree.Root;
 
 	rootToSourceRoot(root: CssTree.Root): TSourceRoot;
+
+	inputCssToSourceRoot(inputCss: string | TSourceRoot): TSourceRoot;
 
 	parseCssToSourceRoot(css: string | Buffer): TSourceRoot;
 

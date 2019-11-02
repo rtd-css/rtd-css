@@ -59,8 +59,6 @@ export class RawOptionsDataToDataTransformer {
 			}
 		}
 
-		const optionBindingToData = optionSchema.bindingToData;
-
 		switch (optionSchema.type) {
 			case DataSchema.OptionType.Single:
 				if (rawOptionsWithSuchName.length !== 1) {

@@ -2,8 +2,6 @@ import { RawOptionsDataToDataTransformer } from './logic/raw-options-data-to-dat
 import { StringToTokensDataTransformer } from './logic/string-to-tokens-data-transformer';
 import { TokensDataToRawOptionsDataTransformer } from './logic/tokens-data-to-raw-options-data-transformer';
 import { DataSchema as DataSchema_ } from './data/data-schema';
-import { RawOptionsData } from './data/raw-options-data';
-import { TokensData } from './data/tokens-data';
 
 export module OptionsParser {
 	export function parse<TResult>(string: string, schema: DataSchema_): TResult {

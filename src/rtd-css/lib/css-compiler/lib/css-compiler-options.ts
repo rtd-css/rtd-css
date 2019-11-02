@@ -1,4 +1,4 @@
-export interface Options {
+export interface CssCompilerOptions {
 	compileOnlyThisDevice?: string;
 	notRemoveConfigDecl?: boolean;
 }

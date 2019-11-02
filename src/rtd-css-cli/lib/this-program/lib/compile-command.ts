@@ -1,5 +1,5 @@
 import fsExtra from 'fs-extra';
-import { FileCompiler } from '../../../../rtd-css';
+import { FileCompiler, FileCompilerOutputRequest } from '../../../../rtd-css';
 import { PostcssCssDriver } from '../../../../postcss-rtd-css';
 import { Cli } from '../../cli';
 
@@ -75,15 +75,16 @@ export class CompileCommand extends Cli.Command<CompileCommandInputData> {
 	}
 
 	protected actionBody(inputData: CompileCommandInputData): void {
-		const compiler = new FileCompiler(
+		const fileCompiler = new FileCompiler();
+
+		fileCompiler.compile(
+			<FileCompilerOutputRequest>{
+				css: FileCompilerOutputRequest.Css.General,
+				js: FileCompilerOutputRequest.Js.GeneralAndDevices,
+			},
 			inputData.inputFilePath,
 			inputData.outputDirectoryPath,
 			new PostcssCssDriver(),
 		);
-
-		compiler.compile(<FileCompiler.OutputRequest>{
-			css: FileCompiler.OutputRequestCss.General,
-			js: FileCompiler.OutputRequestJs.GeneralAndDevices,
-		});
 	}
 }
