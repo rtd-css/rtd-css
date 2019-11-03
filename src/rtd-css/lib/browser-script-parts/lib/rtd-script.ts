@@ -1,4 +1,4 @@
-export const rtdScript = `(function () {
+export const rtdScript = String.raw`(function () {
 
 	var breakpointsForDevice = '{breakpointsForDevice}';
 
