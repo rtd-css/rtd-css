@@ -63,7 +63,7 @@ export const rtdScript = `(function () {
 	function removeClassFromElement(element, classToRemove) {
 		if (element.className) {
 			element.className = element.className.replace(
-				new RegExp('(?:^|\\s)' + classToRemove + (?!\\S)', 'g'),
+				new RegExp('(?:^|\\s)' + classToRemove + '(?!\\S)', 'g'),
 				'',
 			);
 		}
@@ -85,6 +85,8 @@ export const rtdScript = `(function () {
 					}
 
 					addClassToElement(document.documentElement, breakpoint.device.cssClass);
+
+					lastBreakpoint = breakpoint;
 				}
 			},
 			20,
