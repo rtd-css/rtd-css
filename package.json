@@ -2,7 +2,7 @@
 	"name": "rtd-css",
 	"author": "little-foot-2",
 	"homepage": "https://rtd-css.github.io/",
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"license": "Apache-2.0",
 	"description": "RTD-CSS is the compiler intended to split a CSS to different devices",
 	"keywords": [
