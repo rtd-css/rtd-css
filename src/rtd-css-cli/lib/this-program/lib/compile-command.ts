@@ -78,12 +78,12 @@ export class CompileCommand extends Cli.Command<CompileCommandInputData> {
 		const fileCompiler = new FileCompiler();
 
 		fileCompiler.compile(
+			inputData.inputFilePath,
+			inputData.outputDirectoryPath,
 			<FileCompilerOutputRequest>{
 				css: FileCompilerOutputRequest.Css.General,
 				js: FileCompilerOutputRequest.Js.GeneralAndDevices,
 			},
-			inputData.inputFilePath,
-			inputData.outputDirectoryPath,
 			new PostcssCssDriver(),
 		);
 	}

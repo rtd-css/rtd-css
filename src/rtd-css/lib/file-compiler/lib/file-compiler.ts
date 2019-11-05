@@ -5,9 +5,12 @@ import { FileCompilerOutputRequest } from './file-compiler-output-request';
 
 export class FileCompiler {
 	compile(
-		outputRequest: FileCompilerOutputRequest,
 		inputFilePath: string,
 		outputDirectoryPath: string,
+		outputRequest: FileCompilerOutputRequest = {
+			css: FileCompilerOutputRequest.Css.General,
+			js: FileCompilerOutputRequest.Js.GeneralAndDevices,
+		},
 		cssDriver: CssDriver = defaultCssDriver,
 	): void {
 		const lowLevelFileCompiler = new LowLevelFileCompiler(inputFilePath, outputDirectoryPath, cssDriver);
